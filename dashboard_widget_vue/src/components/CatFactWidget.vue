@@ -1,7 +1,7 @@
 <template>
     <div class="cat-fact-widget" @click="getCatFact">
         <h3>Cat Fact Widget</h3>
-        <div>
+        <div class="cat-fact-text">
             <p>{{ catFact }}</p>
             
         </div>
@@ -31,5 +31,9 @@ onMounted(() => {
     border: 1px solid #ccc;
     border-radius: 24px;
     text-align: left;
+    cursor: pointer;
+}
+.cat-fact-text {
+    /* max-width: 550px; */
 }
 </style>

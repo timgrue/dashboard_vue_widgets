@@ -1,15 +1,33 @@
 <template>
   <div class="weather-widget" v-if="isLoaded">
     <h1>Weather in Potsdam</h1>
-    <div>{{ weatherData.current.weather?.[0].main }}</div>
-    <img :src="iconUrl" />
+    <!-- <div>{{ weatherData.current }}</div> -->
+    <div class="weather-widget-inner">
+      <div class="weather-widget-inner-1">
+        <p>{{ weatherData.current.temp }}°</p>
+      </div>
+      <div class="weather-widget-inner-2">
+        <p>feels like:</p>
+        <p>{{ weatherData.current?.feels_like }}°</p>
+      </div>
+      <div class="weather-widget-inner-3">
+        <p>{{ weatherData.current?.weather?.[0].description }}</p>
+      </div>
+      <div class="weather-widget-inner-4">
+        <img
+          :src="`http://openweathermap.org/img/wn/${weatherData?.current?.weather?.[0].icon}@2x.png`"
+        />
+      </div>
+    </div>
   </div>
+  <div class="weather-widget" v-else>Loading Weather...</div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 
-const isLoaded = ref(false);
+let weatherData = ref({});
+let isLoaded = ref(false);
 const geoData = {
   country: "DE",
   lat: 52.459,
@@ -19,31 +37,25 @@ const geoData = {
   zip: "14476",
 };
 
-const weatherData = ref('');
-
-
-// Fetch weather data (example function)
-const fetchWeatherData = async () => {
-  fetch(
-    'https:/api.openweathermap.org/data/3.0/onecall?lat='+ geoData.lat + '&lon=' + geoData.lon + '&appid=79da511870f4d01cba25a6ca7a747c9b'
+async function fetchWeatherData() {
+  await fetch(
+    "https:/api.openweathermap.org/data/3.0/onecall?lat=" +
+      geoData.lat +
+      "&lon=" +
+      geoData.lon +
+      "&units=metric&appid=79da511870f4d01cba25a6ca7a747c9b"
   )
     .then((response) => response.json())
-    .then((data) => {weatherData.value = data})
+    .then((data) => {
+      weatherData = data;
+    })
     .catch((error) => console.error(error));
 
-    console.log(weatherData);
-    isLoaded.value = true;
-};
-
-fetchWeatherData();
-
- function getIconUrl(iconCode) {
-  return "http://openweathermap.org/img/wn/" + iconCode + "@2x.png";
+  isLoaded.value = true;
 }
-const iconCode = ref("weatherData.current?.weather?.[0].icon");
-console.log(weatherData.current?.weather?.[0].icon);
-const iconUrl = ref("http://openweathermap.org/img/wn/"+ iconCode +"@2x.png");
-
+onMounted(() => {
+  fetchWeatherData();
+});
 </script>
 
 <style scoped>
@@ -52,5 +64,35 @@ const iconUrl = ref("http://openweathermap.org/img/wn/"+ iconCode +"@2x.png");
   border: 1px solid #ccc;
   border-radius: 24px;
   text-align: center;
+}
+.weather-widget-inner {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-rows: auto auto;
+}
+.weather-widget-inner-1 {
+  grid-column: 1 / 1;
+  grid-row: 1 / 1;
+  font-size: 2rem;
+}
+.weather-widget-inner-2 {
+  grid-column: 1 / 2;
+  grid-row: 2 / 2;
+  font-size: 1rem;
+  padding-top: 1rem;
+}
+.weather-widget-inner-3 {
+  grid-column: 2 / 2;
+  grid-row: 2 / 1;
+  font-size: 1rem;
+  padding-top: 1rem;
+}
+.weather-widget-inner-4 {
+  grid-column: 2 / 2;
+  grid-row: 2 / 2;
+}
+img {
+  margin: 0 auto;
+  width: 75px;
 }
 </style>
